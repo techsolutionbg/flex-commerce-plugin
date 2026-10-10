@@ -147,4 +147,4 @@ There are no built-in online payments, automated refunds, tax calculations, coup
 
 ## Licensing
 
-No license for the original plugin code has been selected in this repository. Public availability does not grant an open-source license. Bundled third-party code remains subject to its own license notices.
+This plugin is licensed under the GNU General Public License, version 2 or (at your option) any later version (`GPL-2.0-or-later`). The full text of version 2 is in [`LICENSE`](LICENSE). Bundled third-party code, such as `assets/vendor/notyf`, remains subject to its own license notices.

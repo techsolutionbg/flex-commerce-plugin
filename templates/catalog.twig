@@ -1,0 +1,27 @@
+<nav class="commerce-breadcrumbs" aria-label="Път до страницата"><a href="/">Начало</a><span aria-hidden="true">/</span>{% if category %}<a href="/catalog">Продукти</a><span aria-hidden="true">/</span><span>{{ category.name }}</span>{% else %}<span>Продукти</span>{% endif %}</nav>
+<div class="commerce-catalog-layout">
+<aside class="commerce-categories" aria-label="Категории"><h2>Категории</h2><div class="commerce-category-links"><a href="/catalog" {% if not category %}aria-current="page"{% endif %}>Всички продукти</a>{% for item in categories %}<a href="/catalog/category/{{ item.slug|url_encode }}" {% if category and category.id == item.id %}aria-current="page"{% endif %}>{{ item.name }}</a>{% endfor %}</div><h2 class="commerce-filter-heading">Филтри</h2><form class="commerce-filters" method="get" action="{{ base_url }}" data-commerce-live-filters>
+<input type="hidden" name="q" value="{{ filters.q }}">
+<label>Подреди<select name="sort"><option value="newest" {% if filters.sort == 'newest' %}selected{% endif %}>Най-нови</option><option value="name" {% if filters.sort == 'name' %}selected{% endif %}>По име</option><option value="price_asc" {% if filters.sort == 'price_asc' %}selected{% endif %}>Цена: ниска към висока</option><option value="price_desc" {% if filters.sort == 'price_desc' %}selected{% endif %}>Цена: висока към ниска</option></select></label>
+<div class="commerce-price-filter" role="group" aria-label="Ценови диапазон">
+<span class="commerce-filter-label">Цена</span>
+<div class="commerce-price-filter-fields">
+<label><input type="number" name="min_price" inputmode="decimal" min="0" step="0.01" placeholder="{{ price_bounds.min ?: 'от' }}" value="{{ filters.min_price }}" aria-label="Минимална цена"></label>
+<span class="commerce-price-filter-sep" aria-hidden="true">–</span>
+<label><input type="number" name="max_price" inputmode="decimal" min="0" step="0.01" placeholder="{{ price_bounds.max ?: 'до' }}" value="{{ filters.max_price }}" aria-label="Максимална цена"></label>
+</div>
+</div>
+{% include 'components/checkbox.twig' with { name: 'stock', checked: filters.stock == '1', label: 'Само налични' } only %}
+{% include 'components/checkbox.twig' with { name: 'sale', checked: filters.sale == '1', label: 'Само промоции' } only %}
+</form></aside>
+<section class="commerce-products" aria-label="Продукти">
+<button type="button" class="commerce-sidebar-toggle" hidden>Категории и филтри</button>
+{% set filters_active = filters.stock == '1' or filters.sale == '1' or filters.min_price or filters.max_price or filters.sort != 'newest' or filters.q %}
+<div class="commerce-products-toolbar">
+<p class="commerce-results" role="status">{% if total == 0 %}Няма продукти{% elseif pages > 1 %}Показани {{ from }}–{{ to }} от {{ total }}{% else %}{{ total }}{% endif %}{% if total != 0 %} {{ total == 1 ? 'продукт' : 'продукта' }}{% endif %}{% if filters.q %} за „{{ filters.q }}“{% endif %}</p>
+<div class="commerce-toolbar-actions">{% if filters_active %}<a class="commerce-filter-reset" href="{{ base_url }}" title="Изчисти филтрите" aria-label="Изчисти филтрите"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/><path d="m13.4 13.4 6.2 6.2"/><path d="m19.6 13.4-6.2 6.2"/></svg></a>{% endif %}<div data-commerce-columns></div></div>
+</div>
+{% if filters.sort starts with 'price_' %}<p class="commerce-muted">Цените са подредени в рамките на всяка валута.</p>{% endif %}
+<div class="commerce-product-grid" id="commerce-catalog-results">{% if products %}<div data-commerce-boot-skeleton aria-hidden="true">{% for i in 1..8 %}{% include 'components/product-card-skeleton.twig' %}{% endfor %}</div><div data-commerce-boot-items>{% for product in products %}{% include 'product-card.twig' %}{% endfor %}</div><script>(function(){var g=document.getElementById("commerce-catalog-results");if(g)g.setAttribute("data-commerce-booting","1");})();</script>{% else %}<div class="commerce-empty"><h2>Няма намерени продукти</h2><p>Опитайте с друга дума или изчистете филтрите.</p><a href="{{ base_url }}">Всички продукти в тази категория</a></div>{% endif %}</div>
+{% include 'components/pagination.twig' with { pages: pages, page: page, page_urls: page_urls, first_url: first_url, previous_url: previous_url, next_url: next_url, last_url: last_url, label: category ? 'Страници в категорията' : 'Страници на каталога' } only %}
+</section></div>

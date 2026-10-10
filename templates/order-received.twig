@@ -1,0 +1,21 @@
+<section class="commerce-order-received"{% if expires_at %} data-order-received-expires="{{ expires_at }}"{% endif %}>
+  <span class="commerce-order-success" aria-hidden="true">✓</span><h1>Благодарим за поръчката!</h1>
+  <p>Получихме поръчка <strong>{{ order.number }}</strong>. Ще се свържем с вас за потвърждение и доставка.</p>
+  <div class="commerce-checkout-card"><h2>Вашата поръчка</h2>
+    {% for item in order.items %}<div class="commerce-checkout-line"><span>{{ item.name }} × {{ item.quantity }}</span><strong>{{ (item.line_minor / 100)|number_format(2, ',', ' ') }} {{ order.currency }}</strong></div>{% endfor %}
+    <div class="commerce-checkout-line"><span>Доставка</span><span>{{ (order.shipping_minor / 100)|number_format(2, ',', ' ') }} {{ order.currency }}</span></div>
+    <div class="commerce-checkout-line is-total"><span>Общо</span><strong>{{ (order.total_minor / 100)|number_format(2, ',', ' ') }} {{ order.currency }}</strong></div>
+    <p>Плащане с наложен платеж при получаване.</p>
+  </div><a href="/catalog" class="commerce-cart-primary">Продължи пазаруването</a>
+</section>
+{% if expires_at %}<script>
+(() => {
+  const root = document.querySelector("[data-order-received-expires]");
+  if (!root) return;
+  const expires = Number(root.dataset.orderReceivedExpires) * 1000;
+  const goHome = () => { window.location.replace("/"); };
+  const remaining = expires - Date.now();
+  if (remaining <= 0) goHome();
+  else setTimeout(goHome, remaining);
+})();
+</script>{% endif %}

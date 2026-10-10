@@ -1,0 +1,15 @@
+<label class="flex-checkbox{% if class is defined and class %} {{ class }}{% endif %}">
+  <input
+    type="checkbox"
+    class="flex-checkbox__input"
+    name="{{ name }}"
+    value="{{ value|default('1') }}"
+    {% if id is defined and id %}id="{{ id }}"{% endif %}
+    {% if checked is defined and checked %}checked{% endif %}
+    {% if required is defined and required %}required{% endif %}
+    {% if disabled is defined and disabled %}disabled{% endif %}
+    {% if invalid is defined and invalid %}aria-invalid="true"{% endif %}
+  >
+  <span class="flex-checkbox__control" aria-hidden="true"></span>
+  <span class="flex-checkbox__label">{% if label_html is defined %}{{ label_html|raw }}{% else %}{{ label }}{% endif %}</span>
+</label>

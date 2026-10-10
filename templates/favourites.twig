@@ -1,0 +1,17 @@
+<nav class="commerce-breadcrumbs" aria-label="Път до страницата"><a href="/">Начало</a><span aria-hidden="true">/</span><a href="/catalog">Продукти</a><span aria-hidden="true">/</span><span>Любими</span></nav>
+<div class="commerce-catalog-layout commerce-catalog-layout--favourites"><section class="commerce-favourites commerce-products" data-commerce-favourites aria-label="Любими продукти" aria-busy="true"><div class="commerce-products-toolbar"><div data-commerce-columns></div><div class="commerce-favourites-toolbar-actions"><p class="commerce-results" data-favourites-status role="status">Зареждане на любимите…</p><button type="button" class="commerce-favourites-clear" data-favourites-clear hidden>Изчисти всички</button></div></div><div class="commerce-product-grid" data-favourites-grid data-commerce-skeleton="1" aria-busy="true">{% for i in 1..8 %}<article class="commerce-product-card commerce-product-card-skeleton" aria-hidden="true"><div class="commerce-card-media"><div class="commerce-card-image"><span class="commerce-skeleton-block is-image"></span></div></div><div class="commerce-card-details"><span class="commerce-skeleton-block is-title"></span><span class="commerce-skeleton-block is-price"></span><span class="commerce-skeleton-block is-action" aria-hidden="true"><span></span><span></span><span></span></span></div></article>{% endfor %}</div><div class="commerce-favourites-empty" data-favourites-empty hidden role="status">
+  <div class="commerce-favourites-empty-art" aria-hidden="true">
+    <svg class="commerce-favourites-empty-svg" viewBox="0 0 240 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse class="commerce-favourites-empty-glow" cx="120" cy="148" rx="72" ry="14"/>
+      <rect class="commerce-favourites-empty-card" x="48" y="28" width="100" height="118" rx="14" transform="rotate(-8 98 87)"/>
+      <rect class="commerce-favourites-empty-card is-front" x="92" y="36" width="100" height="118" rx="14" transform="rotate(6 142 95)"/>
+      <path class="commerce-favourites-empty-heart" d="M120 118c-1.2-1.1-28-25.2-28-45.2C92 58.6 102.4 50 114 50c7.2 0 13.4 3.6 16 9.2C132.6 53.6 138.8 50 146 50c11.6 0 22 8.6 22 22.8 0 20-26.8 44.1-28 45.2Z"/>
+      <circle class="commerce-favourites-empty-spark" cx="54" cy="52" r="4"/>
+      <circle class="commerce-favourites-empty-spark is-soft" cx="188" cy="44" r="3"/>
+      <circle class="commerce-favourites-empty-spark" cx="198" cy="88" r="2.5"/>
+    </svg>
+  </div>
+  <h2>Списъкът с любими е празен</h2>
+  <p>Запазете продуктите, които харесвате — натиснете сърцето на картата или в страницата на продукта и ще ги намерите тук.</p>
+  <a href="/catalog" class="flex-btn flex-btn--primary">Разгледай каталога</a>
+</div><button type="button" data-favourites-retry hidden>Опитай отново</button><noscript>Включете JavaScript, за да видите запазените в браузъра любими.</noscript></section></div>

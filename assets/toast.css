@@ -1,0 +1,117 @@
+.notyf {
+  z-index: 2147483647;
+  padding: 1rem;
+  gap: 0.65rem;
+}
+/* Keep toast above modal dialogs via the Popover top layer. */
+.notyf[popover] {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  border: 0;
+  padding: 1rem;
+  background: transparent;
+  overflow: visible;
+  pointer-events: none;
+  color: #fff;
+}
+.notyf[popover] .notyf__toast {
+  pointer-events: auto;
+}
+.notyf__toast {
+  max-width: min(22rem, calc(100vw - 2rem));
+  padding: 0.9rem 1rem;
+  border-radius: 0.9rem;
+  box-shadow:
+    0 18px 40px rgb(23 33 24 / 18%),
+    0 2px 8px rgb(23 33 24 / 8%);
+  font-family: inherit;
+}
+.notyf__wrapper {
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.notyf__message {
+  margin: 0;
+  padding: 0.1rem 0.15rem 0 0;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+.notyf__icon {
+  width: 1.55rem;
+  height: 1.55rem;
+  margin: 0;
+  background: transparent !important;
+  color: #fff !important;
+}
+.notyf__icon--success,
+.notyf__icon--error {
+  background: rgb(255 255 255 / 18%) !important;
+  color: #fff !important;
+}
+.notyf__icon--success:after,
+.notyf__icon--success:before,
+.notyf__icon--error:after,
+.notyf__icon--error:before {
+  background: #fff !important;
+}
+.flex-toast-mark {
+  display: grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 16%);
+  color: #fff !important;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.notyf__toast--dismissible .notyf__wrapper {
+  padding-right: 2.75rem;
+}
+.notyf__dismiss {
+  right: 0.65rem !important;
+  margin-right: 0 !important;
+  width: 2rem;
+}
+.notyf__dismiss-btn {
+  background: transparent !important;
+  opacity: 0.8;
+  border-radius: 0.45rem;
+}
+.notyf__dismiss-btn:after,
+.notyf__dismiss-btn:before {
+  background: #fff !important;
+}
+.notyf__dismiss-btn:hover,
+.notyf__dismiss-btn:focus {
+  opacity: 1;
+  background: rgb(255 255 255 / 12%) !important;
+}
+.flex-toast--success {
+  background: #203027 !important;
+}
+.flex-toast--error {
+  background: #9b2c2c !important;
+}
+@media (max-width: 520px) {
+  .notyf {
+    inset: auto 0 0 0 !important;
+    width: 100%;
+    padding: 0.75rem;
+    align-items: stretch;
+  }
+  .notyf__toast {
+    max-width: none;
+    width: 100%;
+    margin: 0 !important;
+  }
+}

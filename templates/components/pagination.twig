@@ -1,0 +1,28 @@
+{% if pages > 1 %}
+<nav class="commerce-pagination" aria-label="{{ label|default('Страници') }}">
+  <p class="commerce-pagination-status" aria-live="polite">Страница {{ page }} от {{ pages }}</p>
+  <div class="commerce-pagination-controls">
+    {% if page > 1 %}
+      <a href="{{ first_url }}" aria-label="Първа страница">«</a>
+      <a href="{{ previous_url }}" aria-label="Предишна страница">‹</a>
+    {% else %}
+      <span aria-disabled="true">«</span>
+      <span aria-disabled="true">‹</span>
+    {% endif %}
+    {% for number, url in page_urls %}
+      {% if number == page %}
+        <span aria-current="page">{{ number }}</span>
+      {% else %}
+        <a href="{{ url }}">{{ number }}</a>
+      {% endif %}
+    {% endfor %}
+    {% if page < pages %}
+      <a href="{{ next_url }}" aria-label="Следваща страница">›</a>
+      <a href="{{ last_url }}" aria-label="Последна страница">»</a>
+    {% else %}
+      <span aria-disabled="true">›</span>
+      <span aria-disabled="true">»</span>
+    {% endif %}
+  </div>
+</nav>
+{% endif %}

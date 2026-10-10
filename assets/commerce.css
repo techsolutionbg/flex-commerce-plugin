@@ -1,0 +1,206 @@
+.commerce-edit-form > fieldset {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.commerce-image-picker > .react-field-hint {
+  margin-top: 0.75rem;
+}
+.commerce-image-picker {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+.commerce-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.commerce-image {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--surface);
+}
+.commerce-image.is-primary {
+  border-color: var(--border-strong);
+}
+.commerce-image-actions {
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+.commerce-image-actions button {
+  min-height: 2.25rem;
+  padding: 0.375rem 0.5rem;
+}
+.commerce-image-actions button svg {
+  width: 1rem;
+  height: 1rem;
+}
+.commerce-image img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  border-radius: var(--radius, 8px);
+}
+.commerce-category {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+  font-weight: 400;
+}
+
+.commerce-image {
+  position: relative;
+  cursor: grab;
+}
+.commerce-image.is-dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+}
+.commerce-image-actions {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.375rem;
+  border-radius: 0.5rem;
+  background: var(--surface);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.commerce-image:hover .commerce-image-actions,
+.commerce-image:focus-within .commerce-image-actions {
+  opacity: 1;
+}
+.commerce-image-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+}
+.commerce-image.is-drop-before::before,
+.commerce-image.is-drop-after::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary, #80a98a);
+  border-radius: 2px;
+}
+.commerce-image.is-drop-before::before {
+  left: -0.6rem;
+}
+.commerce-image.is-drop-after::after {
+  right: -0.6rem;
+}
+@media (hover: none) {
+  .commerce-image-actions {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .commerce-image-actions {
+    transition: none;
+  }
+}
+
+.commerce-image-fields {
+  display: grid;
+  gap: 1rem;
+}
+
+.commerce-product-description {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.commerce-image img {
+  height: auto;
+}
+
+.commerce-sales-admin > .collapsible-section + .collapsible-section {
+  margin-top: 1.25rem;
+}
+.commerce-sales-section,
+.commerce-sales-form,
+.commerce-sales-form > fieldset {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.commerce-sales-section > p,
+.commerce-sales-section .react-field-hint,
+.commerce-sales-form .react-form-actions {
+  margin: 0;
+  padding-top: 0;
+}
+.commerce-sales-section .react-form-grid {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.commerce-image-group {
+  margin-top: 1.25rem;
+}
+.commerce-image-group:first-child {
+  margin-top: 0;
+}
+.commerce-image-group h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 0.75rem;
+}
+.commerce-image-group .react-field-hint {
+  margin: 0.75rem 0 0;
+}
+
+.commerce-image-picker {
+  display: grid;
+  gap: 1rem;
+}
+.commerce-image-picker > .react-field-hint,
+.commerce-image-picker > .commerce-images {
+  margin: 0;
+}
+.commerce-image-group {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  width: 100%;
+}
+.commerce-image-group h3,
+.commerce-image-group .react-field-hint,
+.commerce-image-group .commerce-images {
+  margin: 0;
+}
+.commerce-image-group .commerce-images {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+.commerce-image .commerce-make-primary {
+  align-self: flex-start;
+  font-weight: 400;
+}
+.commerce-image.is-primary {
+  cursor: default;
+}
+
+.commerce-orders-filters{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:16px;width:100%;align-items:end}.commerce-order-editor{display:grid;gap:20px}.commerce-order-editor p{overflow-wrap:anywhere}@media(max-width:640px){.commerce-orders-filters{grid-template-columns:1fr}}

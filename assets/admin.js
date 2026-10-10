@@ -23,6 +23,10 @@ const blank = () => ({
 function ui(host) {
   const { React, components: C, icons, request, toast } = host;
   const h = React.createElement;
+  // Platform time standard (0.1.59+); older platforms show the stored UTC value.
+  const when = (value, style) =>
+    C.DateTime ? h(C.DateTime, { value, style }) : value || "—";
+  const whenSort = (value) => host.time?.parse(value)?.valueOf() ?? String(value ?? "");
   function Select({ label, value, options, onChange, hint, disabled }) {
     return h(
       "label",
@@ -1245,7 +1249,12 @@ export function createPage(host) {
             { key: "reference", label: "Поръчка" },
             { key: "name", label: "Продукт" },
             { key: "quantity", label: "Бройки" },
-            { key: "created_at", label: "Дата (UTC)" },
+            {
+              key: "created_at",
+              label: "Дата",
+              render: (r) => when(r.created_at),
+              sortValue: (r) => whenSort(r.created_at),
+            },
             {
               key: "cancelled",
               label: "Статус",

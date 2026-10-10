@@ -23,7 +23,6 @@ final class StorefrontPages
         }
 
         if (!Page::withTrashed()->where('slug', self::SHIPPING_SLUG)->exists()) {
-            $now = gmdate('Y-m-d H:i:s');
             Page::query()->create([
                 'title' => 'Доставка с Еконт',
                 'slug' => self::SHIPPING_SLUG,

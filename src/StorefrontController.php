@@ -27,13 +27,13 @@ final readonly class StorefrontController
             if ($suggestions || $favouritesData || $preview) {
                 return $this->responses->json(['products' => []], 503, ['Cache-Control' => 'no-store']);
             }
-            return $this->page('Магазинът временно е затворен', '<p>' . htmlspecialchars($public['closed_message'], ENT_QUOTES, 'UTF-8') . '</p>', 503)->withHeader('Retry-After', '300');
+            return $this->page('Магазинът временно е затворен', '<p>' . htmlspecialchars($public['closed_message'], ENT_QUOTES, 'UTF-8') . '</p>', 503, ['type' => 'closed', 'request' => $request])->withHeader('Retry-After', '300');
         }
         if (str_ends_with($request->getUri()->getPath(), '/cart')) {
-            return $this->page('Количка', $this->template('cart.twig', []));
+            return $this->page('Количка', $this->template('cart.twig', []), 200, ['type' => 'cart', 'path' => '/cart', 'request' => $request]);
         }
         if (str_ends_with($request->getUri()->getPath(), '/favourites')) {
-            return $this->page('Любими', $this->template('favourites.twig', []));
+            return $this->page('Любими', $this->template('favourites.twig', []), 200, ['type' => 'favourites', 'path' => '/favourites', 'request' => $request]);
         }
         $catalog = new PublicCatalog();
         try {
@@ -69,7 +69,7 @@ final readonly class StorefrontController
                     $html = $this->template('product.twig', $productView + ['quick_view' => true]);
                     return $this->responses->json(['html' => str_replace(['id="commerce-product-', 'for="commerce-product-'], ['id="commerce-preview-product-', 'for="commerce-preview-product-'], $html)], 200, ['Cache-Control' => 'no-store']);
                 }
-                return $this->page($product['name'], $this->template('product.twig', $productView));
+                return $this->page($product['name'], $this->template('product.twig', $productView), 200, ['type' => 'product', 'path' => '/product/' . rawurlencode($product['slug']), 'product' => $product, 'request' => $request]);
             }
             $data = $catalog->listing($request->getQueryParams(), isset($arguments['slug']) ? (string) $arguments['slug'] : null);
             $base = '/catalog' . ($data['category'] ? '/category/' . rawurlencode($data['category']['slug']) : '');
@@ -86,12 +86,20 @@ final readonly class StorefrontController
             $data['previous_url'] = $this->catalogUrl($base, $queryFilters, max(1, $data['page'] - 1));
             $data['next_url'] = $this->catalogUrl($base, $queryFilters, min($data['pages'], $data['page'] + 1));
             $data['base_url'] = $base;
-            return $this->page($data['category']['name'] ?? 'Продукти', $this->template('catalog.twig', $data));
+            $filtered = array_diff_key($queryFilters, ['sort' => true]) !== [] || ($queryFilters['sort'] ?? 'newest') !== 'newest';
+            return $this->page($data['category']['name'] ?? 'Продукти', $this->template('catalog.twig', $data), 200, [
+                'type' => $data['category'] ? 'category' : 'catalog',
+                'path' => $this->catalogUrl($base, [], $data['page']),
+                'category' => $data['category'],
+                'page' => $data['page'],
+                'filtered' => $filtered,
+                'request' => $request,
+            ]);
         } catch (CommerceException $error) {
             if ($suggestions || $favouritesData || $preview) {
                 return $this->responses->json(['products' => [], 'error' => $error->getMessage()], $error->getCode(), ['Cache-Control' => 'no-store']);
             }
-            return $this->page($error->getCode() === 404 ? 'Не е намерено' : 'Невалидно търсене', '<p>' . htmlspecialchars($error->getMessage(), ENT_QUOTES, 'UTF-8') . '</p><a href="/catalog">Към каталога</a>', $error->getCode());
+            return $this->page($error->getCode() === 404 ? 'Не е намерено' : 'Невалидно търсене', '<p>' . htmlspecialchars($error->getMessage(), ENT_QUOTES, 'UTF-8') . '</p><a href="/catalog">Към каталога</a>', $error->getCode(), ['type' => 'error', 'request' => $request]);
         }
     }
     public function checkoutPage(): ResponseInterface
@@ -110,10 +118,10 @@ final readonly class StorefrontController
             }
         }
 
-        return $this->page('Завършване на поръчката', $extraHtml . $this->template('checkout.twig', []));
+        return $this->page('Завършване на поръчката', $extraHtml . $this->template('checkout.twig', []), 200, ['type' => 'checkout', 'path' => '/checkout']);
     }
-    public function orderPage(array $order, int $expiresAt = 0): ResponseInterface { return $this->page('Поръчката е получена', $this->template('order-received.twig', ['order'=>$order, 'expires_at'=>$expiresAt])); }
-    public function orderError(string $message, int $status): ResponseInterface { return $this->page('Поръчка', '<p>'.htmlspecialchars($message, ENT_QUOTES, 'UTF-8').'</p><a href="/cart">Към количката</a>', $status); }
+    public function orderPage(array $order, int $expiresAt = 0): ResponseInterface { return $this->page('Поръчката е получена', $this->template('order-received.twig', ['order'=>$order, 'expires_at'=>$expiresAt]), 200, ['type' => 'order']); }
+    public function orderError(string $message, int $status): ResponseInterface { return $this->page('Поръчка', '<p>'.htmlspecialchars($message, ENT_QUOTES, 'UTF-8').'</p><a href="/cart">Към количката</a>', $status, ['type' => 'error']); }
     private function catalogUrl(string $base, array $filters, int $page): string
     {
         $query = $filters;
@@ -136,8 +144,14 @@ final readonly class StorefrontController
         }
         return (new Environment($loader, ['cache' => false, 'strict_variables' => true, 'autoescape' => 'html']))->render($template, $data);
     }
-    private function page(string $title, string $content, int $status = 200): ResponseInterface
+    /** @param array<string, mixed> $seo Page type, canonical path and product/category data for public.head and public.title. */
+    private function page(string $title, string $content, int $status = 200, array $seo = []): ResponseInterface
     {
+        $request = $seo['request'] ?? null;
+        unset($seo['request']);
+        $context = ['commerce' => $seo + ['type' => 'page', 'status' => $status, 'title' => $title], 'request' => $request];
+        $headTags = $this->extensions->applyFilters('public.head', '', $context);
+        $documentTitle = $this->extensions->applyFilters('public.title', $title, $context);
         $asset = '/extensions/flex/commerce/assets/assets/';
         $content = '<link rel="stylesheet" href="' . $asset . 'checkout.css?v=10"><script type="module" src="' . $asset . 'checkout.js?v=22"></script><link rel="stylesheet" href="' . $asset . 'storefront.css?v=41"><link rel="stylesheet" href="' . $asset . 'cart.css?v=13"><script type="module" src="' . $asset . 'storefront.js?v=30"></script><div class="flex-commerce-storefront">' . $content . '</div>';
         $pages = $this->pages->publicPageSet();
@@ -147,6 +161,6 @@ final readonly class StorefrontController
         $menus['__flex_media_api'] = $this->media;
         // A transient page lets any active theme provide its usual header, menus and footer.
         $page = new Page(['title' => $title, 'slug' => 'commerce', 'content' => $content, 'status' => 'published', 'settings' => []]);
-        return $this->responses->html($this->themes->render('page.twig', ['page' => $page, 'page_settings' => [], 'page_public_path' => 'plugins/flex/commerce/catalog', 'head_tags' => '', 'navigation' => [], 'featured_media' => []] + $menus), $status, ['Cache-Control' => 'no-store']);
+        return $this->responses->html($this->themes->render('page.twig', ['page' => $page, 'page_settings' => [], 'page_public_path' => 'plugins/flex/commerce/catalog', 'head_tags' => is_string($headTags) ? $headTags : '', 'document_title' => is_string($documentTitle) && trim($documentTitle) !== '' ? $documentTitle : $title, 'navigation' => [], 'featured_media' => []] + $menus), $status, ['Cache-Control' => 'no-store']);
     }
 }

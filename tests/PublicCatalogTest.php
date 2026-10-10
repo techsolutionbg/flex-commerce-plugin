@@ -54,6 +54,7 @@ final class PublicCatalogTest extends TestCase
         self::assertTrue($record['on_sale']);
         self::assertSame('20,00', $record['regular_price']);
         self::assertSame('9,99', $record['price']);
+        self::assertSame(999, $record['price_minor']);
         self::assertSame(50, $record['discount_percent']);
         self::assertSame([$sale['id'], $normal['id']], array_column($this->public->listing(['sort' => 'price_asc'])['products'], 'id'));
         $cart = new \Flex\Commerce\CartStore($this->db->connection());

@@ -18,6 +18,7 @@ async function harness() {
     saved = 0;
   const React = {
     Fragment: "Fragment",
+    useMemo: (factory) => factory(),
     createElement: (type, props, ...children) => ({
       type,
       props: { ...props, children },
@@ -308,4 +309,24 @@ test('order table opens details and cancellation requires confirmation',async()=
  let tree=render();assert.equal(t.all(tree,n=>n.type==='Dialog')[0].props.open,true);
  const select=t.all(tree,n=>n.type?.name==='Select'&&n.props.label==='Статус на поръчката')[0];select.props.onChange('cancelled');tree=render();await t.all(tree,n=>n.type==='form')[0].props.onSubmit({preventDefault(){}});assert.equal(t.calls.filter(c=>c.method==='PUT').length,0);
  const confirmation=t.all(render(),n=>n.type==='ConfirmDialog')[0];assert.equal(confirmation.props.open,true);await confirmation.props.onConfirm();assert.equal(t.calls.at(-1).body.status,'cancelled');assert.equal(t.calls.at(-1).body.version,1);
+});
+
+test("the editor shows panels of other plugins and saves them after the product", async () => {
+  const t = await harness();
+  const runs = [];
+  t.host.components.ExtensionPanels = "ExtensionPanels";
+  t.host.usePanelSaves = () => ({ run: async (context) => runs.push(context) });
+  const e = await editor(t);
+  const panels = t.all(e.render(), (n) => n.type === "ExtensionPanels");
+  assert.equal(panels.length, 1);
+  assert.equal(panels[0].props.location, "commerce.product.editor");
+  assert.equal(panels[0].props.context.type, "product");
+  await t.all(e.render(), (n) => n.type === "form")[0].props.onSubmit({ preventDefault() {} });
+  assert.deepEqual(runs, [{ id: 8 }], "Panels save with the ID of the new product.");
+});
+
+test("the editor works without panel support on older platforms", async () => {
+  const t = await harness();
+  const e = await editor(t);
+  assert.equal(t.all(e.render(), (n) => n.type === "ExtensionPanels").length, 0);
 });

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.6 — 2026-10-10
+
+- Show admin panels of other plugins in the product and category editors (for example the Flex SEO section); they receive the unsaved record and save right after it.
+- Run the `commerce.catalog.deleted` action when a product or category is deleted permanently.
+
 ## 0.2.5 — 2026-10-10
 
 - Apply `public.head` and `public.title` on storefront pages with a `commerce` context (page type, canonical path, product, category, pagination and filter state) so SEO plugins can output meta tags and structured data.

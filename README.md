@@ -1,4 +1,4 @@
-# Flex Commerce 0.2.5
+# Flex Commerce 0.2.6
 
 Flex Commerce adds a product catalogue, session cart, cash-on-delivery checkout and order administration to Flex CMS. Storefront pages use the active theme's layout; the plugin provides its own default Twig views and JavaScript interfaces. The administration and customer-facing messages are currently Bulgarian.
 
@@ -119,6 +119,8 @@ Default templates are in `templates/`. A theme may override matching files in it
 | `commerce.order.updated` | Handle an order status/payment change |
 
 Hooks run trusted installed-plugin code. Integrations must preserve valid item quantities, prices, currencies and delivery data. An order-placed action runs after the database commit; an exception in an integration does not undo the stored order.
+
+The product and category editors show admin panels of other plugins (`commerce.product.editor`, `commerce.category.editor`, Flex CMS 0.1.59+), for example the SEO section of Flex SEO. Panels receive the unsaved record and save after it. Permanently deleting a product or category runs the `commerce.catalog.deleted` action with `['kind' => 'product'|'category', 'id' => int]`.
 
 Storefront pages apply `public.head` and `public.title` with `['commerce' => [...], 'request' => ServerRequestInterface|null]`. The `commerce` array contains `type` (`product`, `catalog`, `category`, `cart`, `favourites`, `checkout`, `order`, `error` or `closed`), the HTTP `status`, and when available `path` (canonical site path), `product` (the public product record, including `price_minor`), `category`, `page` and `filtered` (true for search, filter or non-default sort listings). SEO plugins use it for meta tags, canonical URLs, `noindex` and structured data.
 

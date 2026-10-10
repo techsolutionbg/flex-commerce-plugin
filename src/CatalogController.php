@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Flex\Commerce;
 
 use Flex\Contracts\Http\ResponseFactoryInterface;
+use Flex\Extension\V1\ExtensionApiInterface;
 use Flex\Http\RequestInput;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final readonly class CatalogController
 {
-    public function __construct(private ResponseFactoryInterface $responses, private RequestInput $input) {}
+    public function __construct(private ResponseFactoryInterface $responses, private RequestInput $input, private ?ExtensionApiInterface $extensions = null) {}
 
     /** @param array<string, string> $arguments */
     public function __invoke(ServerRequestInterface $request, array $arguments = []): ResponseInterface
@@ -46,6 +47,10 @@ final readonly class CatalogController
             } elseif ($method === 'DELETE' || ($method === 'POST' && $id !== null)) {
                 $action = $arguments['action'] ?? 'trash';
                 $store->action($kind, $id ?? 0, $action, $body['version'] ?? null);
+                if ($action === 'force') {
+                    // Lets other plugins remove their data for the deleted product or category (for example Flex SEO).
+                    $this->extensions?->doAction('commerce.catalog.deleted', ['kind' => $kind === 'products' ? 'product' : 'category', 'id' => $id ?? 0]);
+                }
                 $result = ['ok' => true];
             } else {
                 $result = ['record' => $store->save($kind, $body, $id)];

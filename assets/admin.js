@@ -460,6 +460,13 @@ export function createPage(host) {
     const mediaById = new Map(record.media.map((media) => [media.id, media]));
     const changed = host.useWorkspaceChanged(),
       saved = host.useWorkspaceSaved();
+    // Panels of other plugins (for example Flex SEO) in the editor; available on Flex CMS 0.1.59+.
+    const saves = host.usePanelSaves ? host.usePanelSaves() : null;
+    const panelType = kind === "products" ? "product" : "category";
+    const panelContext = React.useMemo(
+      () => ({ type: panelType, id: id ? Number(id) : null, values: record }),
+      [panelType, id, record],
+    );
     React.useEffect(() => {
       const abort = new AbortController();
       setLoading(true);
@@ -521,9 +528,20 @@ export function createPage(host) {
           record,
         );
         setRecord(r.record);
+        let panelFailure = "";
+        try {
+          await saves?.run({ id: r.record.id });
+        } catch (error) {
+          panelFailure = error.message;
+        }
         saved?.();
         window.dispatchEvent(new Event("flex-commerce-changed"));
-        toast.success("Записано успешно.");
+        if (panelFailure === "") toast.success("Записано успешно.");
+        else {
+          setFailure(panelFailure);
+          toast.error("Записът е запазен, но разширение не записа данните си: " + panelFailure);
+          changed?.();
+        }
         if (!id) navigate(baseFor(kind) + "/" + r.record.id + "/edit");
       } catch (e) {
         setFailure(e.message);
@@ -1007,6 +1025,12 @@ export function createPage(host) {
                     "Създайте категория от раздел „Категории“.",
                   ),
             ),
+          C.ExtensionPanels &&
+            h(C.ExtensionPanels, {
+              location: "commerce." + panelType + ".editor",
+              context: panelContext,
+              saves,
+            }),
           h(
             "div",
             { className: "react-form-actions" },

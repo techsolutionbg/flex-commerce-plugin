@@ -366,3 +366,17 @@ test("category editor opens a saved category, whose record has no images or medi
   const name = t.all(tree, (n) => n.type?.name === "Field" && n.props.label === "Име")[0];
   assert.equal(name.props.value, "За дома");
 });
+test("sales page renders the history dates and their sort values", async () => {
+  const t = await harness();
+  t.host.components.DateTime = "DateTime";
+  t.host.time = { parse: (value) => ({ valueOf: () => Date.parse(value.replace(" ", "T") + "Z") }) };
+  const sale = { id: 2, name: "Комплект", reference: "FC-1", quantity: 1, cancelled: false, created_at: "2026-10-09 03:13:55" };
+  const page = t.module.createPage(t.host);
+  const root = t.render(page, { path: "/extension-pages/flex-commerce-sales", navigate: () => {} });
+  const node = t.all(root, (n) => typeof n.type === "function" && n.type.name === "SalesPage")[0];
+  const tree = t.render(node.type, node.props);
+  const history = t.all(tree, (n) => n.type === "DataTable" && n.props.extensionPoint === "commerce.sales.history")[0];
+  const date = history.props.columns.find((column) => column.key === "created_at");
+  assert.equal(date.render(sale).type, "DateTime");
+  assert.equal(date.sortValue(sale), Date.parse("2026-10-09T03:13:55Z"));
+});

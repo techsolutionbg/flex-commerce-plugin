@@ -79,11 +79,11 @@ function ui(host) {
       { type: "button", variant: "secondary", onClick, ...extra },
       text,
     );
-  return { React, C, icons, request, toast, h, Select, Field, error, button };
+  return { React, C, icons, request, toast, h, Select, Field, error, button, when, whenSort };
 }
 
 export function createPage(host) {
-  const { React, C, icons, request, toast, h, Select, Field, error, button } =
+  const { React, C, icons, request, toast, h, Select, Field, error, button, when, whenSort } =
     ui(host);
   const OrdersPage = createOrdersPage(host, ui(host));
   function Heading({ title, kind, navigate, action }) {

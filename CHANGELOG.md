@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.9 — 2026-10-11
+
+- Fix the sales page, which failed with "Възникна грешка в интерфейса на разширението" since 0.2.5: the history table formats and sorts dates with helpers that were not passed to the page.
+
 ## 0.2.8 — 2026-10-11
 
 - Fix the category editor, which failed with "Възникна грешка в интерфейса на разширението" for every saved category: category records have no images, and the editor read their media list unconditionally.

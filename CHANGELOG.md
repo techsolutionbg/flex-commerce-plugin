@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.7 — 2026-10-10
+
+- Name the product and category editor sections (`commerce.product.editor.images`, `.basic`, `.pricing`, `.categories`, `commerce.category.editor.basic`) and the catalogue, sales and order tables (`commerce.products.list`, `commerce.categories.list`, `commerce.sales.ranking`, `commerce.sales.history`, `commerce.orders.list`) as admin extension points, so other plugins can add content, columns and actions there (Flex CMS 0.1.60+).
+- Share the edited record and the save coordination with extensions inside the editor.
+
 ## 0.2.6 — 2026-10-10
 
 - Show admin panels of other plugins in the product and category editors (for example the Flex SEO section); they receive the unsaved record and save right after it.

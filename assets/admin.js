@@ -349,6 +349,7 @@ export function createPage(host) {
       }),
       error(failure),
       h(C.DataTable, {
+        extensionPoint: "commerce." + kind + ".list",
         data: rows.filter(
           (r) =>
             (r.name + " " + r.slug + " " + (r.sku || ""))
@@ -467,6 +468,9 @@ export function createPage(host) {
       () => ({ type: panelType, id: id ? Number(id) : null, values: record }),
       [panelType, id, record],
     );
+    // Shares the record and the save coordination with extensions inside the editor.
+    const scoped = (node) =>
+      C.ExtensionScope ? h(C.ExtensionScope, { value: { context: panelContext, saves } }, node) : node;
     React.useEffect(() => {
       const abort = new AbortController();
       setLoading(true);
@@ -558,11 +562,14 @@ export function createPage(host) {
         onChange: (e) => update({ [key]: e.target.value }),
         ...props,
       });
+    // Named extension points (Flex CMS 0.1.60+): other plugins can add content to these sections.
+    const sectionPoints = { images: "images", basic: "basic", stock: "pricing", categories: "categories" };
     const section = (title, key, children) =>
       h(
         C.CollapsibleSection,
         {
           title,
+          extensionPoint: "commerce." + panelType + ".editor." + (sectionPoints[key] ?? key),
           storageKey: "commerce-" + key,
           defaultOpen: true,
           icon: icons.Settings,
@@ -821,7 +828,7 @@ export function createPage(host) {
         h(Heading, { title, kind, navigate }),
         error(failure),
       );
-    return h(
+    return scoped(h(
       React.Fragment,
       null,
       h(Heading, { title, kind, navigate }),
@@ -1056,7 +1063,7 @@ export function createPage(host) {
         onSelect: (media) => selectImages([media], "primary"),
         onSelectMany: (media) => selectImages(media, "additional"),
       }),
-    );
+    ));
   }
   function SalesPage({ navigate }) {
     const [report, setReport] = React.useState({ ranking: [], sales: [] }),
@@ -1157,6 +1164,7 @@ export function createPage(host) {
           "Класация по общо продадени бройки за целия период. Анулираните продажби са изключени.",
         ),
         h(C.DataTable, {
+          extensionPoint: "commerce.sales.ranking",
           data: report.ranking,
           rowKey: (row) => row.id,
           loading,
@@ -1266,6 +1274,7 @@ export function createPage(host) {
           storageKey: "commerce-sales-history",
         },
         h(C.DataTable, {
+          extensionPoint: "commerce.sales.history",
           data: report.sales,
           rowKey: (row) => row.id,
           loading,

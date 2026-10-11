@@ -330,3 +330,23 @@ test("the editor works without panel support on older platforms", async () => {
   const e = await editor(t);
   assert.equal(t.all(e.render(), (n) => n.type === "ExtensionPanels").length, 0);
 });
+
+test("editor sections are named extension points and share the record with extensions", async () => {
+  const t = await harness();
+  t.host.components.ExtensionScope = "ExtensionScope";
+  t.host.usePanelSaves = () => ({ run: async () => {} });
+  const e = await editor(t);
+  const tree = e.render();
+  const points = t
+    .all(tree, (n) => n.type === "CollapsibleSection")
+    .map((n) => n.props.extensionPoint);
+  assert.deepEqual(points, [
+    "commerce.product.editor.images",
+    "commerce.product.editor.basic",
+    "commerce.product.editor.pricing",
+    "commerce.product.editor.categories",
+  ]);
+  const scope = t.all(tree, (n) => n.type === "ExtensionScope")[0];
+  assert.equal(scope.props.value.context.type, "product");
+  assert.equal(typeof scope.props.value.saves.run, "function");
+});

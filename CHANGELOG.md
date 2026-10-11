@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 — 2026-10-11
+
+- Load the storefront files only on pages with products (catalogue, categories, products, favourites, cart, home page highlights, `[commerce_catalog]` and quick-view links) and the checkout files only on checkout and order pages, through Flex CMS 0.1.62 asset groups. Every page keeps the cart, toasts and a small `header.js` for the favourites count.
+- Remove the hand-written `<link>`/`<script>` tags from storefront pages, so each file loads once under its versioned URL.
+- Requires Flex CMS 0.1.62.
+
 ## 0.2.9 — 2026-10-11
 
 - Fix the sales page, which failed with "Възникна грешка в интерфейса на разширението" since 0.2.5: the history table formats and sorts dates with helpers that were not passed to the page.

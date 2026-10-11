@@ -1,10 +1,10 @@
-# Flex Commerce 0.2.9
+# Flex Commerce 0.3.0
 
 Flex Commerce adds a product catalogue, session cart, cash-on-delivery checkout and order administration to Flex CMS. Storefront pages use the active theme's layout; the plugin provides its own default Twig views and JavaScript interfaces. The administration and customer-facing messages are currently Bulgarian.
 
 ## Requirements
 
-- Flex CMS 0.1.56 or later and the platform's PHP 8.3+ runtime and dependencies.
+- Flex CMS 0.1.62 or later and the platform's PHP 8.3+ runtime and dependencies.
 - A configured platform database, media library and active theme with a `page.twig` layout.
 - Platform storefront React runtime and shared lightbox assets.
 - Platform mail settings for order confirmation messages.

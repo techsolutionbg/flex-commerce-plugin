@@ -152,8 +152,12 @@ final readonly class StorefrontController
         $context = ['commerce' => $seo + ['type' => 'page', 'status' => $status, 'title' => $title], 'request' => $request];
         $headTags = $this->extensions->applyFilters('public.head', '', $context);
         $documentTitle = $this->extensions->applyFilters('public.title', $title, $context);
-        $asset = '/extensions/flex/commerce/assets/assets/';
-        $content = '<link rel="stylesheet" href="' . $asset . 'checkout.css?v=10"><script type="module" src="' . $asset . 'checkout.js?v=22"></script><link rel="stylesheet" href="' . $asset . 'storefront.css?v=41"><link rel="stylesheet" href="' . $asset . 'cart.css?v=13"><script type="module" src="' . $asset . 'storefront.js?v=30"></script><div class="flex-commerce-storefront">' . $content . '</div>';
+        // The theme prints these groups with the plugin files for every page (header count, cart, toasts).
+        CommerceAssets::storefront();
+        if (in_array($seo['type'] ?? '', ['checkout', 'order'], true)) {
+            CommerceAssets::checkout();
+        }
+        $content = '<div class="flex-commerce-storefront">' . $content . '</div>';
         $pages = $this->pages->publicPageSet();
         $capabilities = $this->themes->capabilities();
         $menus = $this->menus->forTheme($capabilities['theme'] ?? '', $pages, $capabilities['menu_locations']);

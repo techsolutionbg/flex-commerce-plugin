@@ -10,6 +10,10 @@ final class CatalogEmbedRenderer
 
     public function content(string $html): string
     {
+        // A shared quick-view link (?preview=slug) opens the product over any page.
+        if (is_string($_GET['preview'] ?? null) && $_GET['preview'] !== '') {
+            CommerceAssets::storefront();
+        }
         if (!str_contains($html, '[commerce_catalog]')) {
             return $html;
         }
@@ -60,7 +64,7 @@ final class CatalogEmbedRenderer
                 }
             }
             if ($rendered) {
-                $result = '<link rel="stylesheet" href="/extensions/flex/commerce/assets/assets/storefront.css"><script type="module" src="/extensions/flex/commerce/assets/assets/storefront.js"></script>' . $result;
+                CommerceAssets::storefront();
             }
             return $result;
         } finally {
@@ -82,7 +86,9 @@ final class CatalogEmbedRenderer
         if (!$products) return '';
         $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../templates');
         $markup = (new \Twig\Environment($loader, ['cache' => false, 'strict_variables' => true, 'autoescape' => 'html']))->render('bestsellers.twig', ['products' => $products, 'title' => $title, 'heading_id' => $headingId, 'description' => $description]);
-        return '<link rel="stylesheet" href="/extensions/flex/commerce/assets/assets/storefront.css?v=1"><div class="flex-commerce-storefront starter-bestsellers">' . $markup . '</div>';
+        CommerceAssets::storefront();
+
+        return '<div class="flex-commerce-storefront starter-bestsellers">' . $markup . '</div>';
     }
     public function render(): string
     {

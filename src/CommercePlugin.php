@@ -25,6 +25,7 @@ final class CommercePlugin implements PluginInterface, BootablePluginInterface, 
     public function boot(PluginContext $context): void
     {
         (new StorefrontPages())->ensure();
+        CommerceAssets::use($context->assets ?? null);
         $context->api->addFilter('public.content', static fn(mixed $html): mixed => is_string($html) ? (new CatalogEmbedRenderer())->content($html) : $html);
         $context->routes?->publicRoute('GET', '/favourites', StorefrontController::class, 'favourites');
         $context->routes?->publicRoute('GET', '/checkout', OrderController::class, 'checkout');

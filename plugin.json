@@ -1,9 +1,9 @@
 {
   "id": "flex/commerce",
   "name": "Flex Commerce",
-  "version": "0.2.9",
+  "version": "0.3.0",
   "description": "Продуктов каталог за онлайн магазин.",
-  "minimum_platform_version": "0.1.56",
+  "minimum_platform_version": "0.1.62",
   "entrypoint": "Flex\\Commerce\\CommercePlugin",
   "autoload": {
     "Flex\\Commerce\\": "src/"
@@ -23,7 +23,8 @@
       "assets/checkbox.js",
       "assets/orders-admin.js",
       "assets/toast.js",
-      "assets/vendor/notyf/notyf.es.js"
+      "assets/vendor/notyf/notyf.es.js",
+      "assets/header.js"
     ],
     "styles": [
       "assets/commerce.css",
@@ -35,15 +36,31 @@
     ],
     "public": {
       "scripts": [
-        "assets/storefront.js",
+        "assets/header.js",
         "assets/cart.js",
         "assets/toast.js"
       ],
       "styles": [
-        "assets/storefront.css",
-        "assets/cart.css",
-        "assets/toast.css"
-      ]
+        "assets/cart.css"
+      ],
+      "groups": {
+        "storefront": {
+          "scripts": [
+            "assets/storefront.js"
+          ],
+          "styles": [
+            "assets/storefront.css"
+          ]
+        },
+        "checkout": {
+          "scripts": [
+            "assets/checkout.js"
+          ],
+          "styles": [
+            "assets/checkout.css"
+          ]
+        }
+      }
     }
   },
   "metadata": {

@@ -13,6 +13,7 @@ require_once __DIR__ . '/../src/CatalogStore.php';
 require_once __DIR__ . '/../src/PublicCatalog.php';
 require_once __DIR__ . '/../src/CartStore.php';
 require_once __DIR__ . '/../src/SalesStore.php';
+require_once __DIR__ . '/../src/CommerceAssets.php';
 require_once __DIR__ . '/../src/CatalogEmbedRenderer.php';
 
 final class PublicCatalogTest extends TestCase
@@ -150,8 +151,20 @@ final class PublicCatalogTest extends TestCase
         $this->product(['name' => 'Visible gift']);
         $this->product(['name' => 'Hidden gift', 'status' => 'draft']);
         $renderer = new \Flex\Commerce\CatalogEmbedRenderer($this->public);
+        $assets = new class implements \Flex\Extension\V1\PublicAssetRegistrarInterface {
+            /** @var list<string> */
+            public array $groups = [];
+            public function enqueue(string $group): void { $this->groups[] = $group; }
+            public function enqueueWhen(string $group, callable $condition): void {}
+        };
+        \Flex\Commerce\CommerceAssets::use($assets);
+        self::assertSame('<p>Plain content</p>', $renderer->content('<p>Plain content</p>'));
+        self::assertSame([], $assets->groups, 'pages without a catalogue do not load the storefront');
         $input = '<p>Introduction</p><p>[commerce_catalog]</p><pre>[commerce_catalog]</pre>';
         $output = $renderer->content($input);
+        self::assertSame(['storefront'], $assets->groups);
+        self::assertStringNotContainsString('storefront.js', $output, 'the storefront files come with the page tags, not the content');
+        \Flex\Commerce\CommerceAssets::use(null);
         self::assertStringContainsString('Visible gift', $output);
         self::assertStringNotContainsString('Hidden gift', $output);
         self::assertStringContainsString('<pre>[commerce_catalog]</pre>', $output);

@@ -458,7 +458,8 @@ export function createPage(host) {
       [drag, setDrag] = React.useState(null),
       [drop, setDrop] = React.useState(null),
       [editingId, setEditingId] = React.useState(null);
-    const mediaById = new Map(record.media.map((media) => [media.id, media]));
+    // Categories have no images, so their records come without media.
+    const mediaById = new Map((record.media ?? []).map((media) => [media.id, media]));
     const changed = host.useWorkspaceChanged(),
       saved = host.useWorkspaceSaved();
     // Panels of other plugins (for example Flex SEO) in the editor; available on Flex CMS 0.1.59+.

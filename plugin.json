@@ -1,7 +1,7 @@
 {
   "id": "flex/commerce",
   "name": "Flex Commerce",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "Продуктов каталог за онлайн магазин.",
   "minimum_platform_version": "0.1.56",
   "entrypoint": "Flex\\Commerce\\CommercePlugin",

@@ -1,5 +1,9 @@
 # Changelog
 
+
+## 0.2.8 — 2026-10-11
+
+- Fix the category editor, which failed with "Възникна грешка в интерфейса на разширението" for every saved category: category records have no images, and the editor read their media list unconditionally.
 ## 0.2.7 — 2026-10-10
 
 - Name the product and category editor sections (`commerce.product.editor.images`, `.basic`, `.pricing`, `.categories`, `commerce.category.editor.basic`) and the catalogue, sales and order tables (`commerce.products.list`, `commerce.categories.list`, `commerce.sales.ranking`, `commerce.sales.history`, `commerce.orders.list`) as admin extension points, so other plugins can add content, columns and actions there (Flex CMS 0.1.60+).

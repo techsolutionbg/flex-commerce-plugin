@@ -350,3 +350,19 @@ test("editor sections are named extension points and share the record with exten
   assert.equal(scope.props.value.context.type, "product");
   assert.equal(typeof scope.props.value.saves.run, "function");
 });
+test("category editor opens a saved category, whose record has no images or media", async () => {
+  const t = await harness();
+  t.host.request = async (url) =>
+    url.endsWith("/categories/2")
+      ? { record: { id: 2, name: "За дома", slug: "gift-home", description: "<p>Уют</p>", status: "active", version: 1 } }
+      : { records: [] };
+  const page = t.module.createPage(t.host);
+  const root = t.render(page, { path: "/extension-pages/flex-commerce-categories/2/edit", navigate: () => {} });
+  const node = t.all(root, (n) => typeof n.type === "function" && n.type.name === "Editor")[0];
+  t.render(node.type, node.props);
+  for (const effect of t.effects.splice(0)) effect();
+  await new Promise((r) => setImmediate(r));
+  const tree = t.render(node.type, node.props);
+  const name = t.all(tree, (n) => n.type?.name === "Field" && n.props.label === "Име")[0];
+  assert.equal(name.props.value, "За дома");
+});

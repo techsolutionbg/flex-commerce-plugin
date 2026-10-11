@@ -2,6 +2,7 @@ import {
   requestCart,
   subscribeCart,
   getCartSnapshot,
+  storefrontRuntime,
 } from "./cart.js?v=10";
 import { openLightbox } from "/assets/flex-lightbox.js";
 import { toastSuccess, toastError } from "./toast.js?v=3";
@@ -302,13 +303,12 @@ function initializeCatalogueColumns(runtime) {
     });
   }
 }
-if (window.FlexStorefront) initializeCatalogueColumns(window.FlexStorefront);
-else
-  window.addEventListener(
-    "flex:storefront-ready",
-    (event) => initializeCatalogueColumns(event.detail),
-    { once: true },
-  );
+// The column selector is a React component; React loads only on pages that show it.
+function mountCatalogueColumns() {
+  if (!document.querySelector("[data-commerce-columns]")) return;
+  storefrontRuntime().then((runtime) => runtime && initializeCatalogueColumns(runtime));
+}
+mountCatalogueColumns();
 
 function initializeCatalogueSidebars() {
   for (const layout of document.querySelectorAll(".commerce-catalog-layout")) {
@@ -627,7 +627,7 @@ initializeStorefrontPage();
 document.addEventListener("flex:page-before-change", cleanupStorefrontPage);
 document.addEventListener("flex:page-ready", () => {
   initializeStorefrontPage();
-  if (window.FlexStorefront) initializeCatalogueColumns(window.FlexStorefront);
+  mountCatalogueColumns();
   document.dispatchEvent(new CustomEvent("commerce:catalogue-updated"));
 });
 

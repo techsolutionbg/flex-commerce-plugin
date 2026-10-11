@@ -105,10 +105,16 @@ setInterval(() => {
     requestCart().catch(() => {});
 }, 15000);
 
-export function openCart(opener) {
+export async function openCart(opener) {
   if (!runtime) {
-    window.location.href = "/cart";
-    return;
+    opener?.setAttribute("aria-busy", "true");
+    const rt = await storefrontRuntime();
+    opener?.removeAttribute("aria-busy");
+    if (!rt) {
+      window.location.href = "/cart";
+      return;
+    }
+    initialize(rt);
   }
   if (drawer?.open) return;
   drawer = document.createElement("dialog");
@@ -701,75 +707,116 @@ function initialize(rt) {
     );
   }
   rt.register("commerce.cart", Cart);
-  function mountCartPages() {
-    for (const root of document.querySelectorAll("[data-commerce-cart-page]"))
-      rt.mount("commerce.cart", root, {});
-  }
-  mountCartPages();
   document.addEventListener("flex:page-before-change", () => {
     for (const root of document.querySelectorAll("[data-commerce-cart-page]"))
       rt.unmount(root);
   });
+}
+
+/**
+ * The theme's React runtime for the drawer and the cart page: at once when it is loaded, through the theme's
+ * lazy loader (Flex Starter 1.2.0+), or when an older theme announces it. Null if it does not come in time.
+ */
+export function storefrontRuntime() {
+  if (window.FlexStorefront) return Promise.resolve(window.FlexStorefront);
+  // The theme's scripts come after the plugins' ones, so its loader is looked for once all of them have run.
+  // Modules run before DOMContentLoaded; the navigation timing tells whether it has already fired.
+  const loaded = (performance.getEntriesByType?.("navigation")[0]?.domContentLoadedEventStart ?? 0) > 0;
+  const ready =
+    loaded || document.readyState === "complete"
+      ? Promise.resolve()
+      : new Promise((resolve) => document.addEventListener("DOMContentLoaded", resolve, { once: true }));
+  const loading = ready.then(() => {
+    if (window.FlexStorefront) return window.FlexStorefront;
+    if (window.FlexStorefrontLoader) return window.FlexStorefrontLoader.load();
+    return new Promise((resolve) =>
+      window.addEventListener("flex:storefront-ready", (event) => resolve(event.detail), { once: true }),
+    );
+  });
+  return Promise.race([
+    loading.catch(() => null),
+    new Promise((resolve) => setTimeout(() => resolve(window.FlexStorefront || null), 10000)),
+  ]);
+}
+// Tells the theme's loader that this cart starts without React and asks for it only when needed.
+window.FlexStorefrontLazyClients = true;
+
+function mountCartPages() {
+  if (!document.querySelector("[data-commerce-cart-page]")) return;
+  storefrontRuntime().then((rt) => {
+    if (!rt) return;
+    initialize(rt);
+    for (const root of document.querySelectorAll("[data-commerce-cart-page]"))
+      rt.mount("commerce.cart", root, {});
+  });
+}
+function bindOpenButtons() {
+  for (const button of document.querySelectorAll("[data-commerce-cart-open]")) {
+    if (button.dataset.cartOpenBound) continue;
+    button.dataset.cartOpenBound = "1";
+    button.disabled = false;
+    button.addEventListener("click", () => openCart(button));
+    // Start loading the drawer while the pointer is on its way to the button.
+    button.addEventListener("pointerenter", () => storefrontRuntime(), { once: true });
+  }
+}
+function bindCatalogueButtons() {
+  for (const button of document.querySelectorAll(
+    "[data-commerce-cart-add]",
+  )) {
+    if (button.dataset.cartBound) continue;
+    button.dataset.cartBound = "1";
+    button.addEventListener("click", async () => {
+      if (state.busy) return;
+      const redirect = button.getAttribute("data-commerce-redirect") || "";
+      const label =
+        button.querySelector("[data-commerce-cart-label]") || button;
+      const readyText = label.textContent;
+      let leaving = false;
+      label.textContent = "Добавяне…";
+      button.setAttribute("aria-busy", "true");
+      try {
+        await requestCart({
+          product_id: Number(button.dataset.commerceCartAdd),
+          quantity: 1,
+        });
+        if (redirect) {
+          leaving = true;
+          window.location.assign(redirect);
+          return;
+        }
+        toastSuccess("Продуктът е добавен в количката.");
+      } catch (error) {
+        toastError(
+          error?.message || "Неуспешно добавяне. Опитайте отново.",
+        );
+      } finally {
+        if (leaving) return;
+        label.textContent = readyText;
+        button.removeAttribute("aria-busy");
+      }
+    });
+  }
+}
+// The count, the cart button and "add to cart" work at once; React loads only for the drawer and cart page.
+if (!window.__flexCommerceCartStarted) {
+  window.__flexCommerceCartStarted = true;
+  bindOpenButtons();
+  bindCatalogueButtons();
+  mountCartPages();
   document.addEventListener("flex:page-ready", () => {
     mountCartPages();
+    bindOpenButtons();
     bindCatalogueButtons();
     updateBadge();
     if (document.querySelector("[data-commerce-cart-page]"))
       requestCart().catch(() => {});
   });
-  for (const button of document.querySelectorAll("[data-commerce-cart-open]")) {
-    button.disabled = false;
-    button.addEventListener("click", () => openCart(button));
-  }
-  function bindCatalogueButtons() {
-    for (const button of document.querySelectorAll(
-      "[data-commerce-cart-add]",
-    )) {
-      if (button.dataset.cartBound) continue;
-      button.dataset.cartBound = "1";
-      button.addEventListener("click", async () => {
-        if (state.busy) return;
-        const redirect = button.getAttribute("data-commerce-redirect") || "";
-        const label =
-          button.querySelector("[data-commerce-cart-label]") || button;
-        const readyText = label.textContent;
-        let leaving = false;
-        label.textContent = "Добавяне…";
-        button.setAttribute("aria-busy", "true");
-        try {
-          await requestCart({
-            product_id: Number(button.dataset.commerceCartAdd),
-            quantity: 1,
-          });
-          if (redirect) {
-            leaving = true;
-            window.location.assign(redirect);
-            return;
-          }
-          toastSuccess("Продуктът е добавен в количката.");
-        } catch (error) {
-          toastError(
-            error?.message || "Неуспешно добавяне. Опитайте отново.",
-          );
-        } finally {
-          if (leaving) return;
-          label.textContent = readyText;
-          button.removeAttribute("aria-busy");
-        }
-      });
-    }
-  }
-  bindCatalogueButtons();
   document.addEventListener("commerce:catalogue-updated", () => {
     bindCatalogueButtons();
     updateBadge();
   });
-  requestCart().catch(() => {});
+  // Only pages that show the cart (header count, buttons, cart page) ask the server for it.
+  if (document.querySelector("[data-commerce-cart-count], [data-commerce-cart-open], [data-commerce-cart-add], [data-commerce-cart-page]"))
+    requestCart().catch(() => {});
 }
-if (window.FlexStorefront) initialize(window.FlexStorefront);
-else
-  window.addEventListener(
-    "flex:storefront-ready",
-    (event) => initialize(event.detail),
-    { once: true },
-  );

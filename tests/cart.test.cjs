@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 async function harness(respond) {
   global.window = { addEventListener() {} };
-  global.document = { querySelectorAll() { return []; }, querySelector() { return null; }, visibilityState: 'hidden' };
+  global.document = { querySelectorAll() { return []; }, querySelector() { return null; }, addEventListener() {}, visibilityState: 'hidden' };
   global.BroadcastChannel = undefined;
   const calls = [];
   global.fetch = async (url, options) => { calls.push({ url, ...options }); return respond(calls.at(-1), calls.length); };

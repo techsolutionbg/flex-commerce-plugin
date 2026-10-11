@@ -1,4 +1,4 @@
-# Flex Commerce 0.3.0
+# Flex Commerce 0.4.0
 
 Flex Commerce adds a product catalogue, session cart, cash-on-delivery checkout and order administration to Flex CMS. Storefront pages use the active theme's layout; the plugin provides its own default Twig views and JavaScript interfaces. The administration and customer-facing messages are currently Bulgarian.
 

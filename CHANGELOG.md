@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0 — 2026-10-11
+
+- Start the cart (count, cart button, "add to cart") without React and ask the theme for its React runtime only for the cart drawer, the cart page, the checkout and the catalogue column selector (`storefrontRuntime()` in `cart.js`). With Flex Starter 1.2.0 pages without these load no React at all.
+- Fetch the cart only on pages that show it.
+- Works with themes that still load React on every page.
+
 ## 0.3.0 — 2026-10-11
 
 - Load the storefront files only on pages with products (catalogue, categories, products, favourites, cart, home page highlights, `[commerce_catalog]` and quick-view links) and the checkout files only on checkout and order pages, through Flex CMS 0.1.62 asset groups. Every page keeps the cart, toasts and a small `header.js` for the favourites count.

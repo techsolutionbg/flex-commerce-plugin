@@ -1,4 +1,4 @@
-import { requestCart, subscribeCart, getCartSnapshot } from './cart.js?v=10';
+import { requestCart, subscribeCart, getCartSnapshot, storefrontRuntime } from './cart.js?v=10';
 import { createCheckbox } from './checkbox.js';
 const endpoint='/plugins/flex/commerce/checkout/data';
 const EMPTY_CART_MESSAGE='Количката е празна.';
@@ -232,4 +232,5 @@ function initialize(rt) {
   mount();document.addEventListener('flex:page-ready',mount);
   document.addEventListener('flex:page-before-change',()=>document.querySelectorAll('[data-commerce-checkout]').forEach(root=>rt.unmount(root)));
 }
-if(window.FlexStorefront)initialize(window.FlexStorefront);else window.addEventListener('flex:storefront-ready',e=>initialize(e.detail),{once:true});
+// The checkout is a React component; the theme loads React for it (Flex Starter 1.2.0+ loads React lazily).
+storefrontRuntime().then(rt=>rt&&initialize(rt));

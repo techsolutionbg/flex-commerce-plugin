@@ -111,7 +111,7 @@ export async function openCart(opener) {
     const rt = await storefrontRuntime();
     opener?.removeAttribute("aria-busy");
     if (!rt) {
-      window.location.href = "/cart";
+      navigateTo("/cart");
       return;
     }
     initialize(rt);
@@ -738,6 +738,15 @@ export function storefrontRuntime() {
     new Promise((resolve) => setTimeout(() => resolve(window.FlexStorefront || null), 10000)),
   ]);
 }
+/**
+ * Opens a page of the site. Themes with page navigation (Flex Starter 1.3.0+) swap the content without
+ * reloading; others load the page as usual.
+ */
+export function navigateTo(url, { replace = false } = {}) {
+  if (window.FlexNavigation?.navigate) window.FlexNavigation.navigate(url, { replace });
+  else if (replace) window.location.replace(url);
+  else window.location.assign(url);
+}
 // Tells the theme's loader that this cart starts without React and asks for it only when needed.
 window.FlexStorefrontLazyClients = true;
 
@@ -782,7 +791,7 @@ function bindCatalogueButtons() {
         });
         if (redirect) {
           leaving = true;
-          window.location.assign(redirect);
+          navigateTo(redirect);
           return;
         }
         toastSuccess("Продуктът е добавен в количката.");

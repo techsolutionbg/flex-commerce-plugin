@@ -27,3 +27,11 @@ window.addEventListener("storage", (event) => {
 });
 document.addEventListener("flex:page-ready", refreshFavouritesBadge);
 refreshFavouritesBadge();
+
+// While the theme loads the next page (Flex Starter 1.3.0+), shop pages show a placeholder in their shape:
+// product grids for the catalogue, categories and favourites, a product layout for products.
+document.addEventListener("flex:page-skeleton", (event) => {
+  const path = new URL(event.detail.url, location.href).pathname;
+  if (/^\/(catalog|favourites)(\/|$)/.test(path)) event.detail.variant = "grid";
+  else if (/^\/product\//.test(path)) event.detail.variant = "product";
+});

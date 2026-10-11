@@ -1,4 +1,4 @@
-import { requestCart, subscribeCart, getCartSnapshot, storefrontRuntime } from './cart.js?v=10';
+import { requestCart, subscribeCart, getCartSnapshot, storefrontRuntime, navigateTo } from './cart.js?v=10';
 import { createCheckbox } from './checkbox.js';
 const endpoint='/plugins/flex/commerce/checkout/data';
 const EMPTY_CART_MESSAGE='Количката е празна.';
@@ -149,7 +149,7 @@ function initialize(rt) {
         const response=await fetch(endpoint,{method:'POST',credentials:'same-origin',headers:{Accept:'application/json','Content-Type':'application/json','X-CSRF-Token':data.csrf_token},body:JSON.stringify(payload)});
         const result=await response.json();
         if(!response.ok){if(response.status===409)await refresh();throw new Error(result.error?.message||'Поръчката не беше изпратена.');}
-        await requestCart().catch(()=>{});window.location.assign(result.url);
+        await requestCart().catch(()=>{});navigateTo(result.url);
       }catch(e){setFailure(e.message);sending.current=false;setBusy(false);}
     }
     function field(name,label,options={}) {
@@ -232,5 +232,16 @@ function initialize(rt) {
   mount();document.addEventListener('flex:page-ready',mount);
   document.addEventListener('flex:page-before-change',()=>document.querySelectorAll('[data-commerce-checkout]').forEach(root=>rt.unmount(root)));
 }
+// The order confirmation goes back to the home page when its link expires (it used to be an inline script, which
+// made the page load in full).
+function scheduleOrderExpiry(){
+  const root=document.querySelector('[data-order-received-expires]');
+  if(!root||root.dataset.expiryScheduled)return;
+  root.dataset.expiryScheduled='1';
+  const goHome=()=>{if(root.isConnected)navigateTo('/',{replace:true});};
+  const remaining=Number(root.dataset.orderReceivedExpires)*1000-Date.now();
+  if(remaining<=0)goHome();else setTimeout(goHome,remaining);
+}
+scheduleOrderExpiry();document.addEventListener('flex:page-ready',scheduleOrderExpiry);
 // The checkout is a React component; the theme loads React for it (Flex Starter 1.2.0+ loads React lazily).
 storefrontRuntime().then(rt=>rt&&initialize(rt));

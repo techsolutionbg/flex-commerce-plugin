@@ -10,7 +10,7 @@ async function harness(respond) {
   global.fetch=async(url,options)=>{calls.push({url,...options});return respond(calls.at(-1),calls.length);};
   const source=fs.readFileSync(path.join(__dirname,'../assets/checkout.js'),'utf8')
     .replace(/^import .*?;\r?\n/gm,'')
-    .replace(/^/,'const requestCart=async()=>{},subscribeCart=()=>{},getCartSnapshot=()=>{},storefrontRuntime=async()=>window.FlexStorefront;\nconst createCheckbox=(h)=>function Checkbox(props){return {type:"flex-checkbox",props};};\n');
+    .replace(/^/,'const requestCart=async()=>{},subscribeCart=()=>{},getCartSnapshot=()=>{},storefrontRuntime=async()=>window.FlexStorefront,navigateTo=url=>window.location.assign(url);\nconst createCheckbox=(h)=>function Checkbox(props){return {type:"flex-checkbox",props};};\n');
   await import('data:text/javascript;base64,'+Buffer.from('const setInterval=()=>0;\n'+source+'\n//'+Math.random()).toString('base64'));
   // The checkout registers itself once the theme's React runtime is there.
   await new Promise(resolve=>setImmediate(resolve));

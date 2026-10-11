@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0 — 2026-10-11
+
+- While the theme loads the next page, the catalogue, categories and favourites show a product grid placeholder and products a product layout (`flex:page-skeleton`, Flex Starter 1.3.0+).
+- Open the cart, checkout, order confirmation, "buy now" and quick-view pages without reloading (`navigateTo()` in `cart.js`, through the theme's page navigation where available).
+- Show catalogue products straight from the server instead of hiding them behind a placeholder until the scripts run; the inline scripts of the catalogue and the order confirmation moved into the storefront and checkout modules.
+
 ## 0.4.0 — 2026-10-11
 
 - Start the cart (count, cart button, "add to cart") without React and ask the theme for its React runtime only for the cart drawer, the cart page, the checkout and the catalogue column selector (`storefrontRuntime()` in `cart.js`). With Flex Starter 1.2.0 pages without these load no React at all.

@@ -3,6 +3,7 @@ import {
   subscribeCart,
   getCartSnapshot,
   storefrontRuntime,
+  navigateTo,
 } from "./cart.js?v=10";
 import { openLightbox } from "/assets/flex-lightbox.js";
 import { toastSuccess, toastError } from "./toast.js?v=3";
@@ -497,7 +498,7 @@ function initializeProductPurchases() {
         });
         if (redirect) {
           leaving = true;
-          window.location.assign("/cart");
+          navigateTo("/cart");
           return;
         }
         notifySuccess("Продуктът е добавен в количката.");
@@ -893,7 +894,7 @@ async function openQuickView(slug, { opener = null, syncUrl = true } = {}) {
     typeof HTMLDialogElement === "undefined" ||
     !HTMLDialogElement.prototype.showModal
   ) {
-    window.location.href = productUrl;
+    navigateTo(productUrl);
     return;
   }
   if (activePreview && activePreviewSlug === slug) return;
